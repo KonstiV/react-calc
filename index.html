@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>I'm in a React app!</title>
+     <script src="https://npmcdn.com/react@15.2.1/dist/react.min.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.2.1/dist/react-dom.min.js"></script>
+    <script src="https://npmcdn.com/number-to-locale-string@1.0.1/polyfill.number.toLocaleString.js"></script>
+     <script src="https://npmcdn.com/react-point@2.0.0/umd/react-point.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js
+"></script>
+  <style>
+   html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+button {
+  display: block;
+  background: none;
+  border: none;
+}
+
+#wrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#calc {
+  width: 320px;
+  height: 520px;
+  position: relative;
+}
+.calculator {
+   width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+}
+.keys {
+  display: flex;
+}
+.digits {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  background-color:#bbb;
+  color:black;
+}
+.clear{
+  background-color:#aaa;
+}
+.operators {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap-reverse;
+  background-color:#999;
+  color:white;
+}
+
+.calc-key {
+  width: 80px;
+  height: 80px;
+  border-top: 1px solid #777;
+  border-right: 1px solid #666;  
+  text-align: center;
+  line-height: 80px;
+  font-size: 2em;
+}
+
+.calculator .zero {
+  width: 160px;
+  text-align: left;
+  padding-left: 32px;
+}
+.result-bar,.status-bar{
+  flex:1;
+  height:65px;
+  width:100%;
+  font-size:3em;
+  color:white;
+  background-color:black;
+  text-align:right;
+}
+.clear {
+  width:240px;
+}
+  </style>
+  </head>
+  <body>
+  <div id="wrapper">
+   <div id="calc"></div>
+  </div>
+  </body>
+</html>
+<script type="text/babel">
+class Calculator extends React.Component{
+  state = {
+      firstValue : null,
+      secondValue: null,
+      hasDecimalPlace : false,
+      operator: null,
+      result: null
+  };
+  addValue(value){
+    if(this.state.operator == null){
+      if(this.state.hasDecimalPlace){
+        var sum = this.state.firstValue != null ? parseFloat(this.state.firstValue +"."+ value) : parseFloat("0."+value)
+      }else{
+        var sum = this.state.firstValue != null ? parseFloat(this.state.firstValue +""+ value) : value
+      }
+      this.setState({
+        firstValue : sum,
+        secondValue: null,
+        hasDecimalPlace : false,
+        operator: null,
+        result: null
+      })
+    }else{
+      if(this.state.hasDecimalPlace){
+        var sum = this.state.secondValue != null ? parseFloat(this.state.secondValue +"."+ value) : parseFloat("0."+value)
+      }else{
+        var sum = this.state.secondValue != null ? parseFloat(this.state.secondValue +""+ value) : value
+      }
+      this.setState({
+        firstValue : this.state.firstValue,
+        secondValue: sum,
+        hasDecimalPlace : false,
+        operator: this.state.operator,
+        result: null
+      })
+    }
+
+  }
+  addOperator(operator){
+    if(this.state.firstValue != null){
+      this.setState({
+          firstValue : this.state.firstValue,
+          hasDecimalPlace : false,
+          secondValue: this.state.secondValue,
+          operator: operator,
+          result: null
+        })
+    }else{
+      alert("Before adding operator add a number");
+    }
+  }
+  calc(){
+    var operator = this.state.operator
+    var resultValue;
+    switch(operator){
+      case "+":
+        resultValue = this.state.firstValue + this.state.secondValue
+        break;
+      case "-":
+        resultValue = this.state.firstValue - this.state.secondValue
+        break;
+      case "/":
+        resultValue = this.state.firstValue / this.state.secondValue
+        break;
+      case "x":
+        resultValue = this.state.firstValue * this.state.secondValue
+        break;
+    }
+
+      this.setState({
+        firstValue : this.state.firstValue,
+        secondValue: this.state.secondValue,
+        hasDecimalPlace : false,
+        operator: this.state.operator,
+        result: resultValue
+      })
+  }
+  clear(){
+    this.setState({
+      firstValue : null,
+      secondValue: null,
+      hasDecimalPlace : false,
+      operator: null,
+      result: null
+    })
+  }
+  addDot(){
+    this.setState({
+        firstValue : this.state.firstValue,
+        secondValue: this.state.secondValue,
+        hasDecimalPlace : true,
+        operator: this.state.operator,
+        result: this.state.result
+      })
+  }
+
+  render(){
+    var resultValue = this.state.result
+    var fV = this.state.firstValue
+    var sV = this.state.secondValue
+    var op = this.state.operator
+  return(
+   <div className="calculator">
+    <div className="result-bar">{resultValue}</div>
+    <div className="status-bar"> {fV} {op} {sV} </div>
+    <div className="keys">
+        <div className="digits">
+          <calcButtons className="calc-key zero" onClick={() => this.addValue(0)}>0</calcButtons>
+          <calcButtons className="calc-key dot" onClick={() => this.addDot()}>.</calcButtons>
+          <calcButtons className="calc-key one" onClick={() => this.addValue(1)}>1</calcButtons>
+          <calcButtons className="calc-key two" onClick={() => this.addValue(2)}>2</calcButtons>
+          <calcButtons className="calc-key three" onClick={() => this.addValue(3)}>3</calcButtons>
+          <calcButtons className="calc-key four" onClick={() => this.addValue(4)}>4</calcButtons>
+          <calcButtons className="calc-key five" onClick={() => this.addValue(5)}>5</calcButtons>
+          <calcButtons className="calc-key six" onClick={() => this.addValue(6)}>6</calcButtons>
+          <calcButtons className="calc-key seven" onClick={() => this.addValue(7)}>7</calcButtons>
+          <calcButtons className="calc-key eight" onClick={() => this.addValue(8)}>8</calcButtons>
+          <calcButtons className="calc-key nine" onClick={() => this.addValue(9)}>9</calcButtons>
+          <calcButtons className="calc-key clear" onClick={() => this.clear()}>C</calcButtons>
+
+        </div>
+        <div className="operators">
+          <calcButtons className="calc-key divide" onClick={() => this.addOperator("/")}>/</calcButtons>
+          <calcButtons className="calc-key times" onClick={() => this.addOperator("x")}>x</calcButtons>
+          <calcButtons className="calc-key minus" onClick={() => this.addOperator("-")}>-</calcButtons>
+          <calcButtons className="calc-key plus" onClick={() => this.addOperator("+")}>+</calcButtons>
+          <calcButtons className="calc-key equals" onClick={() => this.calc()}>=</calcButtons>
+        </div>
+    </div>
+    </div>)
+  }
+}
+var calcButtons = React.createClass({
+  render : function(){
+      return(<button className="${className}" onkeypress="{onPress}"/>)
+  }
+})
+ReactDOM.render(
+  <Calculator/>,
+  document.getElementById('calc')
+)
+</script>
